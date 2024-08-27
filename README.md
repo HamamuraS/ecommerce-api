@@ -4,7 +4,9 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
 
-***Para desarrollo, crear archivo .env en raiz y configurar una base de datos y un gestor de identidades. Eg. PostgreSQL y Keycloak***  
+***Para desarrollo, crear archivo .env en raiz y configurar una base de datos y un gestor de identidades. Eg. PostgreSQL y Keycloak***
+
+Tests con `./mvnw clean test quarkus:test`
 
 ## Running the application in dev mode
 

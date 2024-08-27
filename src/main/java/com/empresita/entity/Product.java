@@ -7,11 +7,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
+import com.empresita.DTO.ProductDTO;
 
 @Entity
 @Getter
@@ -44,7 +47,32 @@ public class Product extends PanacheEntityBase {
   @Column(name = "prod_image")
   private String image;
 
+  @ManyToOne
+  @JoinColumn(name = "prod_family", nullable = false)
+  private Family family;
+
   public Product() {
+  }
+
+  public void setValues(Product product) {
+    this.name = product.getName();
+    this.description = product.getDescription();
+    this.price = product.getPrice();
+    this.stock = product.getStock();
+    this.image = product.getImage();
+    this.family = product.getFamily();
+  }
+
+  public ProductDTO toDTO() {
+    ProductDTO dto = new ProductDTO();
+    dto.setId(this.id);
+    dto.setName(this.name);
+    dto.setDescription(this.description);
+    dto.setPrice(this.price);
+    dto.setStock(this.stock);
+    dto.setImage(this.image);
+    dto.setFamily(this.family.getId());
+    return dto;
   }
 
 }

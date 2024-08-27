@@ -1,32 +1,47 @@
 package com.empresita.resource;
 
+import com.empresita.DTO.ProductDTO;
 import com.empresita.entity.Product;
+import com.empresita.service.ProductService;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.ConstrainedTo;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.awt.PageAttributes;
 
 @Path("/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProductResource {
 
+  @Inject
+  ProductService productService;
+
   @GET
-  public Iterable<Product> getProducts() {
-    return Product.listAll();
+  public Response getProducts(
+      @QueryParam("page") Integer page,
+      @QueryParam("size") Integer size,
+      @QueryParam("family") Long familyId
+  ) {
+    if (page == null) {
+      page = 0;
+    }
+    if (size == null) {
+      size = 10;
+    }
+    return Response.status(Response.Status.OK)
+        .entity(productService.findPagedProducts(page, size, familyId))
+        .build();
   }
 
   @GET
@@ -38,9 +53,14 @@ public class ProductResource {
   @POST
   @RolesAllowed("VENDOR")
   @Transactional
-  public Response createProduct(@Valid Product product) {
-    product.persist();
-    return Response.status(Response.Status.CREATED).entity(product).build();
+  public Response createProduct(@Valid ProductDTO product) {
+    Product newProduct = product.toEntity();
+    if (newProduct.getFamily() == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("El producto debe tener una familia valida")
+          .build();
+    }
+    return Response.status(Response.Status.CREATED).entity(newProduct).build();
   }
 
   @PUT
@@ -53,11 +73,7 @@ public class ProductResource {
           .build();
     }
     Product entity = Product.findById(newProduct.getId());
-    entity.setName(newProduct.getName());
-    entity.setDescription(newProduct.getDescription());
-    entity.setPrice(newProduct.getPrice());
-    entity.setStock(newProduct.getStock());
-    entity.setImage(newProduct.getImage());
+    entity.setValues(newProduct);
     return Response.status(Response.Status.OK).entity(entity).build();
   }
 
@@ -67,7 +83,7 @@ public class ProductResource {
   @Transactional
   public Response updateProductStock(
       @PathParam("id") Long id,
-      @HeaderParam("stock") Integer stock) {
+      @QueryParam("stock") Integer stock) {
     Product entity = Product.findById(id);
     if (entity == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
