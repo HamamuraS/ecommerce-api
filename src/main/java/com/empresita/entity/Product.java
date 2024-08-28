@@ -54,6 +54,15 @@ public class Product extends PanacheEntityBase {
   public Product() {
   }
 
+  public Product(Long id, String name, String description, Double price, Integer stock, Family family) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.price = price;
+    this.stock = stock;
+    this.family = family;
+  }
+
   public void setValues(Product product) {
     this.name = product.getName();
     this.description = product.getDescription();

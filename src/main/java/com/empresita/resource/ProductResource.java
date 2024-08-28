@@ -60,6 +60,7 @@ public class ProductResource {
           .entity("El producto debe tener una familia valida")
           .build();
     }
+    newProduct.persist();
     return Response.status(Response.Status.CREATED).entity(newProduct).build();
   }
 

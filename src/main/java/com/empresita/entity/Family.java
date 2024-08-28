@@ -35,6 +35,15 @@ public class Family extends PanacheEntityBase {
   public Family() {
   }
 
+  public Family(String name) {
+    this.name = name;
+  }
+
+  public Family(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
   public void addProduct(Product product) {
     products.add(product);
   }
